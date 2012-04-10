@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.UUID;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaRecorder;
 import android.net.Uri;
@@ -18,7 +21,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.ironclad.android.nowtu.R;
@@ -49,6 +54,7 @@ public class AudioRecorderActivity extends Activity implements OnClickListener {
     ListView mRecordingsListView;
 
     AudioPlayerView mAudioPlayerView;
+    private String mGeneratedName;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,8 +87,6 @@ public class AudioRecorderActivity extends Activity implements OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        loadExistingRecordings();
-        prepareRecorder();
     }
 
     @Override
@@ -114,8 +118,7 @@ public class AudioRecorderActivity extends Activity implements OnClickListener {
             }
         }
         else if (v == mConfirmButton) {
-            saveSample();
-            finish();
+            confirmAndSave();
         }
         else if (v == mDiscardButton) {
             resetRecorder();
@@ -123,6 +126,37 @@ public class AudioRecorderActivity extends Activity implements OnClickListener {
         else if (v == mShowRecordingsButton) {
             mRecordPreviousFlipper.showNext();
         }
+    }
+
+    private void confirmAndSave() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // Set up recording name input
+        final EditText recordingNameEditor = new EditText(this);
+        recordingNameEditor.setText(mGeneratedName);
+        recordingNameEditor.selectAll();
+        builder.setView(recordingNameEditor);
+
+        builder.setTitle(R.string.save_as).setNeutralButton(R.string.okay, new Dialog.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                String name = recordingNameEditor.getText().toString();
+                if (name.length() > 0) {
+                    // Set the recording's new location, close the dialog, and save
+                    String oldLocation = mRecordingLocation;
+                    setRecordingLocation(name);
+
+                    if (!new File(oldLocation).renameTo(new File(mRecordingLocation))) {
+                        Toast.makeText(AudioRecorderActivity.this, R.string.unable_to_rename_file,
+                                Toast.LENGTH_LONG).show();
+                    }
+
+                    dialog.dismiss();
+
+                    saveSample();
+                    finish();
+                }
+            }
+        }).create().show();
     }
 
     private void prepareRecorder() {
@@ -133,7 +167,8 @@ public class AudioRecorderActivity extends Activity implements OnClickListener {
         mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-        mRecordingLocation = getRecordingStorageDirectory() + UUID.randomUUID() + ".mp4";
+        mGeneratedName = UUID.randomUUID().toString();
+        setRecordingLocation(mGeneratedName);
         mRecorder.setOutputFile(mRecordingLocation);
         try {
             mRecorder.prepare();
@@ -147,6 +182,10 @@ public class AudioRecorderActivity extends Activity implements OnClickListener {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    private void setRecordingLocation(String recordingName) {
+        mRecordingLocation = getRecordingStorageDirectory() + recordingName + ".mp4";
     }
 
     private String getRecordingStorageDirectory() {
