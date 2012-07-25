@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,7 +52,9 @@ public class AudioRecordingsAdapter extends BaseAdapter {
             holder = new ViewHolder();
             convertView = mLayoutInflater.inflate(android.R.layout.simple_list_item_2, null);
             holder.dateRecorded = (TextView) convertView.findViewById(android.R.id.text1);
+            holder.dateRecorded.setTextColor(Color.WHITE);
             holder.size = (TextView) convertView.findViewById(android.R.id.text2);
+            holder.size.setTextColor(Color.WHITE);
             convertView.setTag(holder);
         }
         else {
