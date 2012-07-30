@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,13 +27,17 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import android.widget.ViewSwitcher;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
 import com.ironclad.android.nowtu.R;
+import com.ironclad.android.nowtu.adapter.TabsAdapter;
 import com.ironclad.android.nowtu.widget.AudioPlayerView;
 
-public class AudioRecorderActivity extends Activity implements OnClickListener {
-    private int RECORD_VIEW = 0;
-    private int PREVIEW_VIEW = 1;
-    private int LOADING_VIEW = 2;
+public class AudioRecorderActivity extends SherlockActivity implements OnClickListener, ActionBar.TabListener {
+    private final int RECORD_VIEW = 0;
+    private final int PREVIEW_VIEW = 1;
+    private final int LOADING_VIEW = 2;
 
     boolean saveFile = false;
 
@@ -40,7 +45,7 @@ public class AudioRecorderActivity extends Activity implements OnClickListener {
     boolean mRecording;
     String mRecordingLocation;
 
-    ViewFlipper mRecordPreviousFlipper;
+    ViewSwitcher mRecordPreviousFlipper;
     ViewFlipper mStateViewSwitcher;
 
     Button mRecordButton;
@@ -49,12 +54,13 @@ public class AudioRecorderActivity extends Activity implements OnClickListener {
     Button mConfirmButton;
     Button mDiscardButton;
 
-    Button mShowRecordingsButton;
-
     ListView mRecordingsListView;
 
     AudioPlayerView mAudioPlayerView;
     private String mGeneratedName;
+
+    ActionBar.Tab recordTab;
+    ActionBar.Tab previousTab;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,7 +68,7 @@ public class AudioRecorderActivity extends Activity implements OnClickListener {
 
         setContentView(R.layout.audio_recorder);
 
-        mRecordPreviousFlipper = (ViewFlipper) findViewById(R.id.record_previous_flipper);
+        mRecordPreviousFlipper = (ViewSwitcher) findViewById(R.id.record_previous_flipper);
         mStateViewSwitcher = (ViewFlipper) findViewById(R.id.state_viewswitcher);
 
         mRecordButton = (Button) findViewById(R.id.record_button);
@@ -76,12 +82,33 @@ public class AudioRecorderActivity extends Activity implements OnClickListener {
         mConfirmButton = (Button) findViewById(R.id.confirm_button);
         mConfirmButton.setOnClickListener(this);
 
-        mShowRecordingsButton = (Button) findViewById(R.id.show_recordings_button);
-        mShowRecordingsButton.setOnClickListener(this);
-
         mRecordingsListView = (ListView) findViewById(R.id.recordingsListView);
 
         mAudioPlayerView = (AudioPlayerView) findViewById(R.id.audio_player);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        actionBar.setDisplayShowHomeEnabled(false);
+        actionBar.setDisplayShowTitleEnabled(false);
+
+        recordTab = actionBar.newTab();
+        recordTab.setText("Record");
+        recordTab.setTabListener(this);
+        actionBar.addTab(recordTab);
+
+        previousTab = actionBar.newTab();
+        previousTab.setText("Previous Recordings");
+        previousTab.setTabListener(this);
+        actionBar.addTab(previousTab);
+
+        loadExistingRecordings();
+        prepareRecorder();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -122,9 +149,6 @@ public class AudioRecorderActivity extends Activity implements OnClickListener {
         }
         else if (v == mDiscardButton) {
             resetRecorder();
-        }
-        else if (v == mShowRecordingsButton) {
-            mRecordPreviousFlipper.showNext();
         }
     }
 
@@ -246,5 +270,27 @@ public class AudioRecorderActivity extends Activity implements OnClickListener {
                 finish();
             }
         });
+    }
+
+    @Override
+    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+        if (tab == recordTab) {
+            mRecordPreviousFlipper.setOutAnimation(this, R.anim.out_to_right);
+            mRecordPreviousFlipper.setInAnimation(this, R.anim.in_from_left);
+            mRecordPreviousFlipper.setDisplayedChild(0);
+        }
+        else if (tab == previousTab) {
+            mRecordPreviousFlipper.setOutAnimation(this, R.anim.out_to_left);
+            mRecordPreviousFlipper.setInAnimation(this, R.anim.in_from_right);
+            mRecordPreviousFlipper.setDisplayedChild(1);
+        }
+    }
+
+    @Override
+    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+    }
+
+    @Override
+    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
     }
 }
