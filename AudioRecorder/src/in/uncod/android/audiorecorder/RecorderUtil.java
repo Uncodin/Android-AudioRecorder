@@ -1,4 +1,4 @@
-package com.uncodin.android.audiorecorder;
+package in.uncod.android.audiorecorder;
 
 import android.app.Activity;
 import android.content.Intent;

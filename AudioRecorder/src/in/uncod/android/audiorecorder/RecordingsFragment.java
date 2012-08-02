@@ -1,4 +1,4 @@
-package com.uncodin.android.audiorecorder;
+package in.uncod.android.audiorecorder;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import com.actionbarsherlock.app.SherlockFragment;
-import com.ironclad.android.nowtu.R;
 
 import java.io.File;
 

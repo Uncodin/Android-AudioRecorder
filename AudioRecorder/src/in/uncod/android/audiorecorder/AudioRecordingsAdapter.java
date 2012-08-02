@@ -1,4 +1,4 @@
-package com.uncodin.android.audiorecorder;
+package in.uncod.android.audiorecorder;
 
 import java.io.File;
 import java.text.SimpleDateFormat;

@@ -1,4 +1,4 @@
-package com.uncodin.android.audiorecorder;
+package in.uncod.android.audiorecorder;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -21,8 +21,8 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 import android.widget.ViewSwitcher;
 import com.actionbarsherlock.app.SherlockFragment;
-import com.ironclad.android.nowtu.R;
-import com.ironclad.android.nowtu.widget.AudioPlayerView;
+
+import in.uncod.android.media.widget.AudioPlayerView;
 
 import java.io.File;
 import java.io.IOException;
@@ -144,6 +144,8 @@ public class RecorderFragment extends SherlockFragment implements View.OnClickLi
                     }
 
                     dialog.dismiss();
+                    
+                    saveFile = true;
 
                     RecorderUtil.saveSample(getActivity(), mRecordingLocation);
                     getActivity().finish();

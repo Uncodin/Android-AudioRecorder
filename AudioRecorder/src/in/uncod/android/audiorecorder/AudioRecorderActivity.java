@@ -1,4 +1,4 @@
-package com.uncodin.android.audiorecorder;
+package in.uncod.android.audiorecorder;
 
 import android.support.v4.view.ViewPager;
 import android.support.v4.app.FragmentTransaction;
@@ -9,7 +9,6 @@ import android.os.Bundle;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.ironclad.android.nowtu.R;
 
 public class AudioRecorderActivity extends SherlockFragmentActivity implements ActionBar.TabListener, ViewPager.OnPageChangeListener {
 
