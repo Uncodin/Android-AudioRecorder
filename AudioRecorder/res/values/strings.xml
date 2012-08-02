@@ -1,0 +1,15 @@
+<resources>
+
+    <string name="in.uncode.android.audiorecorder.app_name">Audio Recorder</string>
+    <string name="record">Record</string>
+    <string name="preview">Preview</string>
+    <string name="confirm_audio">Save</string>
+    <string name="discard_recording">Discard</string>
+    <string name="chronometer">Chronometer</string>
+    <string name="default_record_timer">00:00</string>
+    <string name="previous_recordings">Previous Recordings</string>
+    <string name="unable_to_rename_file">Unable to rename file</string>
+    <string name="save_as">Save As</string>
+    <string name="okay">OK</string>
+
+</resources>

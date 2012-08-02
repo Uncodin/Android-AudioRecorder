@@ -1,0 +1,45 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="in.uncod.android.audiorecorder"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="15" />
+
+    <application
+        android:icon="@drawable/android_mic"
+        android:label="@string/in.uncode.android.audiorecorder.app_name"
+        android:theme="@style/AppTheme" >
+    </application>
+
+    <!--  Copy this activity to your application's manifest to embed the recorder -->
+    <!-- Uncodin Audio Recorder -->
+    <activity
+        android:name="in.uncod.android.audiorecorder.AudioRecorderActivity"
+        android:configChanges="orientation|keyboardHidden|screenSize"
+        android:icon="@drawable/android_mic"
+        android:label="@string/in.uncode.android.audiorecorder.app_name"
+        android:taskAffinity="" >
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        <intent-filter>
+            <action android:name="android.intent.action.GET_CONTENT" />
+
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.OPENABLE" />
+
+            <data android:mimeType="audio/amr" />
+            <data android:mimeType="audio/3gpp" />
+        </intent-filter>
+        <intent-filter>
+            <action android:name="android.provider.MediaStore.RECORD_SOUND" />
+
+            <category android:name="android.intent.category.DEFAULT" />
+        </intent-filter>
+    </activity>
+
+</manifest>
