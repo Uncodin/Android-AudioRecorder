@@ -63,7 +63,7 @@ public class AudioRecordingsAdapter extends BaseAdapter {
 
         File file = getItem(position);
         holder.dateRecorded.setText(dateFormatter.format(new Date(file.lastModified())));
-        holder.size.setText("" + file.length());
+        holder.size.setText(file.length() + " bytes");
 
         return convertView;
     }

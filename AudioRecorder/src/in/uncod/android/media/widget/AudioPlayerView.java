@@ -1,5 +1,7 @@
 package in.uncod.android.media.widget;
 
+import java.io.IOException;
+
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Handler;
@@ -11,11 +13,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
-import java.io.IOException;
-
-/**
- * Created by IntelliJ IDEA. Date: 2/14/12 Time: 10:33 AM
- */
 public class AudioPlayerView extends LinearLayout implements MediaPlayer.OnPreparedListener,
         View.OnClickListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
 
@@ -86,19 +83,19 @@ public class AudioPlayerView extends LinearLayout implements MediaPlayer.OnPrepa
     @Override
     public void onClick(View view) {
         switch (mPlayerState) {
-            case Paused:
+        case Paused:
 
-                mMediaPlayer.start();
-                updateButtonState(PlayerState.Playing);
+            mMediaPlayer.start();
+            updateButtonState(PlayerState.Playing);
 
-                break;
+            break;
 
-            case Playing:
+        case Playing:
 
-                mMediaPlayer.pause();
-                updateButtonState(PlayerState.Paused);
+            mMediaPlayer.pause();
+            updateButtonState(PlayerState.Paused);
 
-                break;
+            break;
         }
     }
 
@@ -132,25 +129,25 @@ public class AudioPlayerView extends LinearLayout implements MediaPlayer.OnPrepa
         mPlayerState = playerState;
 
         switch (playerState) {
-            case Paused:
+        case Paused:
 
-                mPlayPauseButton.setImageResource(android.R.drawable.ic_media_play);
-                mPlayPauseButton.setEnabled(true);
+            mPlayPauseButton.setImageResource(android.R.drawable.ic_media_play);
+            mPlayPauseButton.setEnabled(true);
 
-                break;
-            case Playing:
+            break;
+        case Playing:
 
-                mPlayPauseButton.setImageResource(android.R.drawable.ic_media_pause);
-                mPlayPauseButton.setEnabled(true);
+            mPlayPauseButton.setImageResource(android.R.drawable.ic_media_pause);
+            mPlayPauseButton.setEnabled(true);
 
-                break;
+            break;
 
-            case Preparing:
+        case Preparing:
 
-                mPlayPauseButton.setImageResource(android.R.drawable.ic_media_play);
-                mPlayPauseButton.setEnabled(false);
+            mPlayPauseButton.setImageResource(android.R.drawable.ic_media_play);
+            mPlayPauseButton.setEnabled(false);
 
-                break;
+            break;
         }
     }
 
@@ -186,7 +183,8 @@ public class AudioPlayerView extends LinearLayout implements MediaPlayer.OnPrepa
             if (mMediaPlayer != null) {
                 mMediaPlayer.seekTo(0);
             }
-        } finally {
+        }
+        finally {
             // Ignore exception; should only happen when no media has been loaded into the player
         }
     }

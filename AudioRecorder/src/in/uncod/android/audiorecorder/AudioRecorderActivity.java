@@ -1,16 +1,19 @@
 package in.uncod.android.audiorecorder;
 
-import android.support.v4.view.ViewPager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.Fragment;
+import java.io.File;
+
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
-public class AudioRecorderActivity extends SherlockFragmentActivity implements ActionBar.TabListener, ViewPager.OnPageChangeListener {
+public class AudioRecorderActivity extends SherlockFragmentActivity implements ActionBar.TabListener,
+        ViewPager.OnPageChangeListener {
 
     ActionBar.Tab recordTab;
     ActionBar.Tab previousTab;
@@ -104,5 +107,11 @@ public class AudioRecorderActivity extends SherlockFragmentActivity implements A
         public int getCount() {
             return 2;
         }
+    }
+
+    public File getRecordingStorageDirectory() {
+        File dir = new File(getExternalFilesDir(null), "recordings");
+        dir.mkdirs();
+        return dir;
     }
 }

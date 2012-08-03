@@ -1,19 +1,22 @@
 package in.uncod.android.audiorecorder;
 
+import java.io.File;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
 import com.actionbarsherlock.app.SherlockFragment;
 
-import java.io.File;
-
-public class RecordingsFragment extends SherlockFragment {
-
+class RecordingsFragment extends SherlockFragment {
     ListView mRecordingsListView;
-    String mRecordingLocation;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -34,18 +37,19 @@ public class RecordingsFragment extends SherlockFragment {
     }
 
     private void loadExistingRecordings() {
-        File recordingsDir = new File(RecorderUtil.getRecordingStorageDirectory());
+        File recordingsDir = ((AudioRecorderActivity) getActivity()).getRecordingStorageDirectory();
         File[] recordingFiles = recordingsDir.listFiles();
         AudioRecordingsAdapter filesAdapter = new AudioRecordingsAdapter(getActivity(), recordingFiles);
         mRecordingsListView.setAdapter(filesAdapter);
         mRecordingsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 File file = (File) parent.getAdapter().getItem(position);
-                mRecordingLocation = file.getAbsolutePath();
-                RecorderUtil.saveSample(getActivity(), mRecordingLocation);
+
+                Uri fileUri = Uri.fromFile(file);
+                Log.d("NowTu Audio Recorder", "Choosing file at: " + fileUri);
+                getActivity().setResult(Activity.RESULT_OK, new Intent().setData(fileUri));
                 getActivity().finish();
             }
         });
     }
-
 }
