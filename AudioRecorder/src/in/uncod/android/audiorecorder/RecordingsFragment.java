@@ -17,6 +17,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 
 class RecordingsFragment extends SherlockFragment {
     ListView mRecordingsListView;
+    private AudioRecordingsAdapter mAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -25,22 +26,6 @@ class RecordingsFragment extends SherlockFragment {
 
         mRecordingsListView = (ListView) view.findViewById(R.id.recordingsListView);
 
-        return view;
-
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        loadExistingRecordings();
-    }
-
-    private void loadExistingRecordings() {
-        File recordingsDir = ((AudioRecorderActivity) getActivity()).getRecordingStorageDirectory();
-        File[] recordingFiles = recordingsDir.listFiles();
-        AudioRecordingsAdapter filesAdapter = new AudioRecordingsAdapter(getActivity(), recordingFiles);
-        mRecordingsListView.setAdapter(filesAdapter);
         mRecordingsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 File file = (File) parent.getAdapter().getItem(position);
@@ -51,5 +36,25 @@ class RecordingsFragment extends SherlockFragment {
                 getActivity().finish();
             }
         });
+
+        return view;
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (isVisibleToUser) {
+            loadExistingRecordings();
+        }
+    }
+
+    private void loadExistingRecordings() {
+        File recordingsDir = ((AudioRecorderActivity) getActivity()).getRecordingStorageDirectory();
+        File[] recordingFiles = recordingsDir.listFiles();
+
+        mAdapter = new AudioRecordingsAdapter(getActivity(), recordingFiles);
+
+        mRecordingsListView.setAdapter(mAdapter);
     }
 }

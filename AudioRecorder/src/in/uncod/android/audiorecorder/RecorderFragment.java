@@ -4,6 +4,8 @@ import in.uncod.android.media.widget.AudioPlayerView;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import android.app.Activity;
@@ -15,6 +17,7 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +32,11 @@ import android.widget.ViewSwitcher;
 import com.actionbarsherlock.app.SherlockFragment;
 
 class RecorderFragment extends SherlockFragment implements View.OnClickListener {
+    /**
+     * A list of intents that can be used to request recordings
+     */
+    protected static final List<String> REQUEST_INTENTS = Arrays.asList(new String[] {
+            Intent.ACTION_GET_CONTENT, MediaStore.Audio.Media.RECORD_SOUND_ACTION });
 
     private final int RECORD_VIEW = 0;
     private final int PREVIEW_VIEW = 1;
@@ -36,7 +44,7 @@ class RecorderFragment extends SherlockFragment implements View.OnClickListener 
 
     MediaRecorder mRecorder;
     boolean mRecording;
-    String mRecordingLocation;
+    File mRecordingLocation;
 
     ViewSwitcher mRecordPreviousFlipper;
     ViewFlipper mStateViewSwitcher;
@@ -52,9 +60,10 @@ class RecorderFragment extends SherlockFragment implements View.OnClickListener 
     AudioPlayerView mAudioPlayerView;
     private String mGeneratedName;
 
+    private boolean mInitialized;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_recorder, null);
 
         mStateViewSwitcher = (ViewFlipper) view.findViewById(R.id.state_viewswitcher);
@@ -72,38 +81,37 @@ class RecorderFragment extends SherlockFragment implements View.OnClickListener 
 
         mAudioPlayerView = (AudioPlayerView) view.findViewById(R.id.audio_player);
 
-        return view;
+        mInitialized = true;
 
+        return view;
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
+        mStateViewSwitcher.setDisplayedChild(LOADING_VIEW);
         prepareRecorder();
+        mStateViewSwitcher.setDisplayedChild(RECORD_VIEW);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mRecorder.release();
-        mRecording = false;
-        if (!saveFile) {
-            deleteRecording();
-        }
+
+        resetRecorder(false);
     }
 
     @Override
     public void onClick(View view) {
-
         if (view == mRecordButton) {
             if (mRecording) {
                 mRecorder.stop();
                 mRecordChronometer.stop();
                 mRecording = false;
                 mRecordButton.setText(R.string.record);
+                mAudioPlayerView.setMediaLocation(mRecordingLocation.getAbsolutePath());
                 mStateViewSwitcher.setDisplayedChild(PREVIEW_VIEW);
-                mAudioPlayerView.setMediaLocation(mRecordingLocation);
             }
             else {
                 mRecorder.start();
@@ -115,9 +123,11 @@ class RecorderFragment extends SherlockFragment implements View.OnClickListener 
         }
         else if (view == mConfirmButton) {
             confirmAndSave();
+            mStateViewSwitcher.setDisplayedChild(RECORD_VIEW);
         }
         else if (view == mDiscardButton) {
-            resetRecorder();
+            resetRecorder(true);
+            mStateViewSwitcher.setDisplayedChild(RECORD_VIEW);
         }
     }
 
@@ -135,29 +145,41 @@ class RecorderFragment extends SherlockFragment implements View.OnClickListener 
                 String name = recordingNameEditor.getText().toString();
                 if (name.length() > 0) {
                     // Set the recording's new location, close the dialog, and save
-                    String oldLocation = mRecordingLocation;
+                    File oldLocation = mRecordingLocation;
                     setRecordingLocation(name);
 
-                    if (!new File(oldLocation).renameTo(new File(mRecordingLocation))) {
+                    if (!oldLocation.renameTo(mRecordingLocation)) {
                         Toast.makeText(getActivity(), R.string.unable_to_rename_file, Toast.LENGTH_LONG)
                                 .show();
+
+                        // Couldn't rename; work with the previous name
+                        mRecordingLocation = oldLocation;
                     }
 
                     dialog.dismiss();
 
                     saveFile = true;
 
-                    Uri fileUri = Uri.fromFile(new File(mRecordingLocation));
+                    Uri fileUri = Uri.fromFile(mRecordingLocation);
                     Log.d("NowTu Audio Recorder", "Saving file at: " + fileUri);
-                    getActivity().setResult(Activity.RESULT_OK, new Intent().setData(fileUri));
-                    getActivity().finish();
+
+                    if (REQUEST_INTENTS.contains(getActivity().getIntent().getAction())) {
+                        // Recorder was started via a request for audio; set result and finish
+                        getActivity().setResult(Activity.RESULT_OK, new Intent().setData(fileUri));
+                        getActivity().finish();
+                    }
+                    else {
+                        // Return to record view
+                        resetRecorder(true);
+                    }
                 }
             }
         }).create().show();
     }
 
     private void prepareRecorder() {
-        mStateViewSwitcher.setDisplayedChild(LOADING_VIEW);
+        saveFile = false;
+
         mRecordChronometer.setBase(SystemClock.elapsedRealtime());
 
         // Make sure we're not recording music playing in the background; ask the MediaPlaybackService to pause playback
@@ -169,10 +191,10 @@ class RecorderFragment extends SherlockFragment implements View.OnClickListener 
         mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
         mGeneratedName = UUID.randomUUID().toString();
         setRecordingLocation(mGeneratedName);
-        mRecorder.setOutputFile(mRecordingLocation);
+        mRecorder.setOutputFile(mRecordingLocation.getAbsolutePath());
+
         try {
             mRecorder.prepare();
-            mStateViewSwitcher.setDisplayedChild(RECORD_VIEW);
         }
         catch (IllegalStateException e) {
             e.printStackTrace();
@@ -182,9 +204,16 @@ class RecorderFragment extends SherlockFragment implements View.OnClickListener 
         }
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        resetRecorder(mInitialized && isVisibleToUser);
+    }
+
     private void setRecordingLocation(String recordingName) {
         mRecordingLocation = new File(((AudioRecorderActivity) getActivity()).getRecordingStorageDirectory(),
-                recordingName + ".mp4").getAbsolutePath();
+                recordingName + ".mp4");
     }
 
     private void stopAudioPlayback() {
@@ -195,17 +224,25 @@ class RecorderFragment extends SherlockFragment implements View.OnClickListener 
         getActivity().sendBroadcast(i);
     }
 
-    private void resetRecorder() {
-        mRecorder.release();
+    private void resetRecorder(boolean prepare) {
+        if (mRecorder != null) {
+            mRecorder.release();
+        }
+
         mRecording = false;
-        deleteRecording();
-        prepareRecorder();
+
+        if (!saveFile) {
+            deleteRecording();
+        }
+
+        if (prepare) {
+            prepareRecorder();
+        }
     }
 
     private void deleteRecording() {
-        File recording = new File(mRecordingLocation);
-        if (recording.exists()) {
-            recording.delete();
+        if (mRecordingLocation != null && mRecordingLocation.exists()) {
+            mRecordingLocation.delete();
         }
     }
 }
