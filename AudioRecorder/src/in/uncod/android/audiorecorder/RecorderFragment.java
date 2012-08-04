@@ -4,8 +4,6 @@ import in.uncod.android.media.widget.AudioPlayerView;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 import android.app.Activity;
@@ -17,7 +15,6 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,12 +29,6 @@ import android.widget.ViewSwitcher;
 import com.actionbarsherlock.app.SherlockFragment;
 
 class RecorderFragment extends SherlockFragment implements View.OnClickListener {
-    /**
-     * A list of intents that can be used to request recordings
-     */
-    protected static final List<String> REQUEST_INTENTS = Arrays.asList(new String[] {
-            Intent.ACTION_GET_CONTENT, MediaStore.Audio.Media.RECORD_SOUND_ACTION });
-
     private final int RECORD_VIEW = 0;
     private final int PREVIEW_VIEW = 1;
     private final int LOADING_VIEW = 2;
@@ -163,7 +154,7 @@ class RecorderFragment extends SherlockFragment implements View.OnClickListener 
                     Uri fileUri = Uri.fromFile(mRecordingLocation);
                     Log.d("NowTu Audio Recorder", "Saving file at: " + fileUri);
 
-                    if (REQUEST_INTENTS.contains(getActivity().getIntent().getAction())) {
+                    if (AudioRecorderActivity.REQUEST_INTENTS.contains(getActivity().getIntent().getAction())) {
                         // Recorder was started via a request for audio; set result and finish
                         getActivity().setResult(Activity.RESULT_OK, new Intent().setData(fileUri));
                         getActivity().finish();

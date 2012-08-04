@@ -1,8 +1,14 @@
 package in.uncod.android.audiorecorder;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.provider.MediaStore.Audio;
+import android.provider.MediaStore.Audio.Media;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -23,6 +29,11 @@ public class AudioRecorderActivity extends SherlockFragmentActivity implements A
     RecordingsFragment mRecordingsFragment;
 
     ActionBar mActionBar;
+    /**
+     * A list of intents that can be used to request recordings
+     */
+    protected static final List<String> REQUEST_INTENTS = Arrays.asList(new String[] {
+            Intent.ACTION_GET_CONTENT, MediaStore.Audio.Media.RECORD_SOUND_ACTION });
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
