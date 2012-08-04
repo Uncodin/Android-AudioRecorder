@@ -45,12 +45,12 @@ public class AudioRecorderActivity extends SherlockFragmentActivity implements A
         mActionBar.setDisplayShowTitleEnabled(false);
 
         recordTab = mActionBar.newTab();
-        recordTab.setText("Record");
+        recordTab.setText(R.string.record);
         recordTab.setTabListener(this);
         mActionBar.addTab(recordTab);
 
         previousTab = mActionBar.newTab();
-        previousTab.setText("Previous Recordings");
+        previousTab.setText(R.string.previous_recordings);
         previousTab.setTabListener(this);
         mActionBar.addTab(previousTab);
     }
@@ -110,7 +110,7 @@ public class AudioRecorderActivity extends SherlockFragmentActivity implements A
     }
 
     public File getRecordingStorageDirectory() {
-        File dir = new File(getExternalFilesDir(null), "recordings");
+        File dir = new File(getFilesDir(), "recordings");
         dir.mkdirs();
         return dir;
     }
