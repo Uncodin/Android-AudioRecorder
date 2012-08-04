@@ -7,8 +7,6 @@ import java.util.List;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.provider.MediaStore.Audio;
-import android.provider.MediaStore.Audio.Media;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -56,7 +54,7 @@ public class AudioRecorderActivity extends SherlockFragmentActivity implements A
         mActionBar.setDisplayShowTitleEnabled(false);
 
         recordTab = mActionBar.newTab();
-        recordTab.setText(R.string.record);
+        recordTab.setText(R.string.record_new);
         recordTab.setTabListener(this);
         mActionBar.addTab(recordTab);
 
