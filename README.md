@@ -7,6 +7,7 @@ Dependencies
 ------------
 
 ActionBarSherlock
+Uncodin Common
 
 Usage
 -----

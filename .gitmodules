@@ -1,0 +1,3 @@
+[submodule "Android-Common"]
+	path = Android-Common
+	url = git@github.com:Uncodin/Android-Common.git
