@@ -1,0 +1,46 @@
+#! /bin/bash
+function abspath()
+{
+  case "${1}" in
+    [./]*)
+    echo "$(cd ${1%/*}; pwd)/${1##*/}"
+    ;;
+    *)
+    echo "${PWD}/${1}"
+    ;;
+  esac
+}
+# Vars
+CURDIR=$(dirname $0)
+PROJDIR=$(abspath "${CURDIR}/")
+APPLICATION_NAME="Android Audio Recorder"
+INFO=${PROJDIR}/AudioRecorder/AndroidManifest.xml
+GITPATH=/usr/bin:/usr/local/bin:/usr/local/git/bin
+PATH=$PATH:$GITPATH; export PATH
+APP=${PROJDIR}/AudioRecorder/bin/LoginActivity-release-unsigned.apk
+
+
+KEYPATH=${PROJDIR}/nowtu-key.keystore
+KEYALIAS=nowtu
+KEYPASS='ironcladpa$$'
+#----Check if Git exists
+if [ -z $( which git ) ]; then
+  echo "Unable to find git binary in \$GITPATH"
+  exit 1
+fi
+
+#Keychain
+security unlock -p jenkins
+
+#Sign Build
+jarsigner -verbose -keystore ${KEYPATH} -storepass ${KEYPASS} -keypass ${KEYPASS} ${APP} ${KEYALIAS}
+
+
+GIT_HASHVERSION=$( git log --pretty=format:'%h' --abbrev-commit -n 1 )
+#XXX: HACK!
+GIT_REPONAME=$(git remote show -n origin | grep 'Fetch URL' | sed -e 's#.*Fetch URL: .*:##' | tr '/' '-')
+NEWAPP=${PROJDIR}/AudioRecorder/bin/${GIT_REPONAME}_${BUILD_NUMBER}_${GIT_HASHVERSION}.apk
+
+zipalign -v 4 ${APP} ${NEWAPP}
+
+curl -F binary=@${NEWAPP} -F version="${GIT_HASHVERSION}-${BUILD_NUMBER}" http://builds.ironclad.mobi/api/android-audio-recorder/upload
