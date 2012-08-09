@@ -7,8 +7,9 @@
         android:minSdkVersion="8"
         android:targetSdkVersion="15" />
 
-    <!-- Any embedding application will need the following permission -->
+    <!-- Any embedding application will need the following permissions -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:icon="@drawable/android_mic"
