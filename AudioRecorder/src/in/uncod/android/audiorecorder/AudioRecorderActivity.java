@@ -119,7 +119,7 @@ public class AudioRecorderActivity extends SherlockFragmentActivity implements A
     }
 
     public File getRecordingStorageDirectory() {
-        File dir = new File(getFilesDir(), "recordings");
+        File dir = new File(getExternalFilesDir(null), "recordings");
         dir.mkdirs();
         return dir;
     }
