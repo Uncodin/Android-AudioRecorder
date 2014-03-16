@@ -6,8 +6,9 @@ A simple audio recorder for Android
 Dependencies
 ------------
 
-ActionBarSherlock
-Uncodin Common
+* ActionBarSherlock
+
+* Uncodin Common
 
 Usage
 -----
